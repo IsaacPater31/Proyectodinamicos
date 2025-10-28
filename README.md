@@ -20,7 +20,6 @@ y' = a₂x + b₂y
 - `main.py`: Programa principal con la interfaz de usuario
 - `analisis_estabilidad.py`: Módulo con la lógica de análisis matemático
 - `visualizador_sistema.py`: Módulo para la visualización gráfica
-- `app_pcritico_python.py`: Versión original (mantenida como referencia)
 
 ## Requisitos
 
@@ -100,9 +99,19 @@ Esto indica que hay infinitos puntos críticos o que el sistema es degenerado.
 - Resultado: Centro, Estable
 - Valores propios: ±1.000i
 
-## Cambios Recientes
+## Arquitectura del Programa
 
-- ✅ **Corrección de la lógica**: Implementación correcta de los teoremas de clasificación
-- ✅ **Mejora en la precisión**: Uso de valores propios en lugar de determinante/traza
-- ✅ **Casos especiales**: Manejo correcto del Nodo Especial y valores propios complejos
-- ✅ **Verificación**: Pruebas exhaustivas de todos los casos posibles
+Este programa fue desarrollado desde cero con una arquitectura modular que separa claramente las responsabilidades:
+
+### **Módulos Principales:**
+
+1. **`main.py`**: Interfaz de usuario y controlador principal
+2. **`analisis_estabilidad.py`**: Lógica matemática y análisis de estabilidad
+3. **`visualizador_sistema.py`**: Generación y manejo de gráficos
+
+### **Características de Diseño:**
+
+- ✅ **Modularidad**: Cada módulo tiene una responsabilidad específica
+- ✅ **Separación de concerns**: UI, lógica matemática y visualización están separados
+- ✅ **Reutilización**: Los módulos pueden ser reutilizados independientemente
+- ✅ **Mantenibilidad**: Código organizado y fácil de mantener
