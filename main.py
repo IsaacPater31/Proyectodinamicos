@@ -96,28 +96,24 @@ class InterfazAnalisisEstabilidad:
             row=2, column=0, sticky=tk.W, pady=5)
         self.entry_a1 = ttk.Entry(self.frame_entrada, width=15, style='Entrada.TEntry')
         self.entry_a1.grid(row=2, column=1, pady=5, padx=(10, 0))
-        self.entry_a1.insert(0, "1")  # Valor por defecto
         
         # Coeficiente b1
         ttk.Label(self.frame_entrada, text="b₁:", font=('Arial', 10, 'bold')).grid(
             row=3, column=0, sticky=tk.W, pady=5)
         self.entry_b1 = ttk.Entry(self.frame_entrada, width=15, style='Entrada.TEntry')
         self.entry_b1.grid(row=3, column=1, pady=5, padx=(10, 0))
-        self.entry_b1.insert(0, "0")  # Valor por defecto
         
         # Coeficiente a2
         ttk.Label(self.frame_entrada, text="a₂:", font=('Arial', 10, 'bold')).grid(
             row=4, column=0, sticky=tk.W, pady=5)
         self.entry_a2 = ttk.Entry(self.frame_entrada, width=15, style='Entrada.TEntry')
         self.entry_a2.grid(row=4, column=1, pady=5, padx=(10, 0))
-        self.entry_a2.insert(0, "0")  # Valor por defecto
         
         # Coeficiente b2
         ttk.Label(self.frame_entrada, text="b₂:", font=('Arial', 10, 'bold')).grid(
             row=5, column=0, sticky=tk.W, pady=5)
         self.entry_b2 = ttk.Entry(self.frame_entrada, width=15, style='Entrada.TEntry')
         self.entry_b2.grid(row=5, column=1, pady=5, padx=(10, 0))
-        self.entry_b2.insert(0, "-1")  # Valor por defecto
         
     def crear_botones_control(self):
         """Crea los botones de control"""
@@ -177,9 +173,23 @@ class InterfazAnalisisEstabilidad:
             raise ValueError("Por favor ingrese valores numéricos válidos en todos los campos")
     
     def mostrar_resultado(self, resultado):
-        """Muestra el resultado en el panel de resultados"""
+        """Muestra el resultado en el panel de resultados con formato mejorado"""
         self.texto_resultados.delete(1.0, tk.END)
-        self.texto_resultados.insert(tk.END, resultado)
+        
+        # Formatear el resultado con estructura clara
+        lineas = resultado.split('\n')
+        if len(lineas) >= 3:
+            tipo = lineas[0]
+            estabilidad = lineas[1]
+            valores_propios = lineas[2]
+            
+            texto_formateado = f"Tipo: {tipo}\n"
+            texto_formateado += f"Estabilidad: {estabilidad}\n"
+            texto_formateado += f"Valores propios: {valores_propios}"
+        else:
+            texto_formateado = resultado
+            
+        self.texto_resultados.insert(tk.END, texto_formateado)
         
     def analizar_sistema(self):
         """Analiza el sistema y muestra los resultados"""

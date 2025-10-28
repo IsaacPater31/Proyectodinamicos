@@ -146,6 +146,21 @@ def determinar_estabilidad(m1, m2):
     else:
         return "Inestable"
 
+def formatear_resultado(resultado):
+    """Formatea el resultado con estructura clara"""
+    lineas = resultado.split('\n')
+    if len(lineas) >= 3:
+        tipo = lineas[0]
+        estabilidad = lineas[1]
+        valores_propios = lineas[2]
+        
+        texto_formateado = f"Tipo: {tipo}\n"
+        texto_formateado += f"Estabilidad: {estabilidad}\n"
+        texto_formateado += f"Valores propios: {valores_propios}"
+        return texto_formateado
+    else:
+        return resultado
+
 def calcular():
     try:
         # Obtener valores de los coeficientes
@@ -157,8 +172,9 @@ def calcular():
         # Analizar estabilidad
         resultado = analizar_estabilidad(a1, b1, a2, b2)
         
-        # Mostrar resultado
-        messagebox.showinfo("Resultado del Análisis", resultado)
+        # Formatear y mostrar resultado
+        resultado_formateado = formatear_resultado(resultado)
+        messagebox.showinfo("Resultado del Análisis", resultado_formateado)
         
         # Crear y mostrar gráfica
         fig = graficar_trayectorias(a1, b1, a2, b2)
