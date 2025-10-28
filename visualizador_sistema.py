@@ -43,9 +43,9 @@ class VisualizadorSistema:
         
         return X, Y, U, V
     
-    def calcular_trayectoria(self, x0, y0, a1, b1, a2, b2, t_max=2, puntos=100):
+    def calcular_trayectoria(self, x0, y0, a1, b1, a2, b2, t_max=3, puntos=200):
         """
-        Calcula una trayectoria específica del sistema
+        Calcula una trayectoria específica del sistema usando integración numérica
         
         Args:
             x0, y0: Condiciones iniciales
@@ -56,16 +56,40 @@ class VisualizadorSistema:
         Returns:
             tuple: (x_trayectoria, y_trayectoria)
         """
-        t = np.linspace(0, t_max, puntos)
-        X0 = np.array([x0, y0])
-        A = np.array([[a1, b1], [a2, b2]])
+        from scipy.integrate import solve_ivp
         
-        trayectoria = np.zeros((len(t), 2))
+        def sistema_dinamico(t, y):
+            return [a1 * y[0] + b1 * y[1], a2 * y[0] + b2 * y[1]]
         
-        for i in range(len(t)):
-            trayectoria[i] = np.exp(A * t[i]) @ X0
+        # Integrar hacia adelante y hacia atrás
+        t_span = (0, t_max)
+        t_eval = np.linspace(0, t_max, puntos)
         
-        return trayectoria[:, 0], trayectoria[:, 1]
+        try:
+            sol = solve_ivp(sistema_dinamico, t_span, [x0, y0], t_eval=t_eval, 
+                          rtol=1e-8, atol=1e-10)
+            if sol.success:
+                return sol.y[0], sol.y[1]
+        except:
+            pass
+        
+        # Fallback: usar método de Euler mejorado
+        dt = t_max / puntos
+        x_traj = [x0]
+        y_traj = [y0]
+        
+        for i in range(puntos - 1):
+            x_curr, y_curr = x_traj[-1], y_traj[-1]
+            dx = a1 * x_curr + b1 * y_curr
+            dy = a2 * x_curr + b2 * y_curr
+            
+            x_next = x_curr + dt * dx
+            y_next = y_curr + dt * dy
+            
+            x_traj.append(x_next)
+            y_traj.append(y_next)
+        
+        return np.array(x_traj), np.array(y_traj)
     
     def crear_grafica_completa(self, a1, b1, a2, b2, titulo="Trayectorias del Sistema"):
         """
@@ -81,41 +105,79 @@ class VisualizadorSistema:
         fig = plt.Figure(figsize=self.figura_tamano)
         ax = fig.add_subplot(111)
         
-        # Crear campo vectorial
-        X, Y, U, V = self.calcular_campo_vectorial((-2, 2), (-2, 2), a1, b1, a2, b2)
+        # Determinar el rango dinámico basado en los valores propios
+        valores_propios = np.linalg.eigvals([[a1, b1], [a2, b2]])
+        max_real = max(np.abs(np.real(valores_propios)))
         
-        # Normalizar vectores para mejor visualización
-        norm = np.sqrt(U**2 + V**2)
-        U_norm = np.divide(U, norm, out=np.zeros_like(U), where=norm!=0)
-        V_norm = np.divide(V, norm, out=np.zeros_like(V), where=norm!=0)
+        # Ajustar rango según el comportamiento del sistema
+        if max_real > 2:
+            rango = 1.5
+        elif max_real > 1:
+            rango = 2.0
+        else:
+            rango = 3.0
         
-        # Graficar campo vectorial
-        ax.quiver(X, Y, U_norm, V_norm, norm, cmap='viridis', alpha=0.7, scale=20)
+        # Crear campo vectorial con mayor densidad
+        X, Y, U, V = self.calcular_campo_vectorial((-rango, rango), (-rango, rango), 
+                                                  a1, b1, a2, b2, densidad=25)
         
-        # Graficar trayectorias desde diferentes puntos iniciales
-        puntos_iniciales = [-1.5, -1.0, -0.5, 0.5, 1.0, 1.5]
+        # Calcular magnitud para colorear las flechas
+        magnitud = np.sqrt(U**2 + V**2)
         
-        for x0 in puntos_iniciales:
-            for y0 in puntos_iniciales:
+        # Graficar campo vectorial con mejor visualización
+        ax.quiver(X, Y, U, V, magnitud, cmap='plasma', alpha=0.8, scale=30, 
+                 scale_units='xy', width=0.003)
+        
+        # Seleccionar puntos iniciales estratégicos
+        if max_real > 1:  # Sistema rápido
+            puntos_iniciales = [-rango*0.8, -rango*0.4, rango*0.4, rango*0.8]
+        else:  # Sistema lento
+            puntos_iniciales = [-rango*0.9, -rango*0.6, -rango*0.3, rango*0.3, rango*0.6, rango*0.9]
+        
+        colores = ['red', 'blue', 'green', 'orange', 'purple', 'brown']
+        
+        # Graficar trayectorias con diferentes colores y grosores
+        for i, x0 in enumerate(puntos_iniciales):
+            for j, y0 in enumerate(puntos_iniciales):
                 if abs(x0) > 0.1 or abs(y0) > 0.1:  # Evitar el punto crítico
-                    x_traj, y_traj = self.calcular_trayectoria(x0, y0, a1, b1, a2, b2)
-                    ax.plot(x_traj, y_traj, 'r-', linewidth=0.8, alpha=0.6)
+                    try:
+                        x_traj, y_traj = self.calcular_trayectoria(x0, y0, a1, b1, a2, b2)
+                        
+                        # Filtrar trayectorias que se salen del rango
+                        mask = (np.abs(x_traj) < rango*1.2) & (np.abs(y_traj) < rango*1.2)
+                        x_traj = x_traj[mask]
+                        y_traj = y_traj[mask]
+                        
+                        if len(x_traj) > 10:  # Solo mostrar trayectorias significativas
+                            color_idx = (i + j) % len(colores)
+                            ax.plot(x_traj, y_traj, color=colores[color_idx], 
+                                   linewidth=1.2, alpha=0.8)
+                            
+                            # Marcar punto inicial
+                            ax.plot(x0, y0, 'o', color=colores[color_idx], 
+                                   markersize=4, alpha=0.7)
+                    except:
+                        continue
         
-        # Marcar el punto crítico
-        ax.plot([0], [0], 'ko', markersize=12, label='Punto crítico (0,0)', 
-                markeredgecolor='white', markeredgewidth=2)
+        # Marcar el punto crítico con mejor visibilidad
+        ax.plot([0], [0], 'ko', markersize=15, label='Punto crítico (0,0)', 
+                markeredgecolor='white', markeredgewidth=3, zorder=10)
         
-        # Configurar gráfica
-        ax.set_xlabel('x', fontsize=12)
-        ax.set_ylabel('y', fontsize=12)
-        ax.set_title(titulo, fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
+        # Configurar gráfica con mejor estilo
+        ax.set_xlabel('x', fontsize=12, fontweight='bold')
+        ax.set_ylabel('y', fontsize=12, fontweight='bold')
+        ax.set_title(titulo, fontsize=14, fontweight='bold', pad=20)
+        ax.grid(True, alpha=0.4, linestyle='--')
         ax.set_aspect('equal')
-        ax.legend(loc='upper right')
+        ax.legend(loc='best', fontsize=10)
         
         # Establecer límites de los ejes
-        ax.set_xlim(-2, 2)
-        ax.set_ylim(-2, 2)
+        ax.set_xlim(-rango, rango)
+        ax.set_ylim(-rango, rango)
+        
+        # Agregar líneas de referencia
+        ax.axhline(y=0, color='black', linestyle='-', alpha=0.3, linewidth=0.5)
+        ax.axvline(x=0, color='black', linestyle='-', alpha=0.3, linewidth=0.5)
         
         return fig
     
