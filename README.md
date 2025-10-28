@@ -9,10 +9,11 @@ y' = a₂x + b₂y
 
 ## Características
 
-- **Análisis matemático completo**: Determina el tipo de punto crítico y su estabilidad
+- **Análisis matemático completo**: Determina el tipo de punto crítico y su estabilidad según los teoremas de sistemas dinámicos
 - **Visualización gráfica**: Muestra las trayectorias alrededor del punto crítico
 - **Interfaz mejorada**: Diseño moderno y fácil de usar
 - **Modularidad**: Código organizado en módulos separados
+- **Implementación correcta**: Sigue estrictamente los teoremas matemáticos para clasificación
 
 ## Archivos del Proyecto
 
@@ -52,20 +53,56 @@ python main.py
    - Los valores propios
    - Una gráfica con las trayectorias
 
-## Tipos de Puntos Críticos
+## Teoremas Implementados
 
-El programa puede identificar:
+El programa implementa correctamente los siguientes teoremas para clasificar puntos críticos:
 
-- **Nodo estable (atractor)**: det > 0, traza < 0
-- **Nodo inestable (repulsor)**: det > 0, traza > 0
-- **Centro**: det > 0, traza = 0
-- **Punto silla (inestable)**: det < 0
-- **Nodo impropio**: det = 0, traza ≠ 0
-- **Caso degenerado**: det = 0, traza = 0
+### Clasificación por Tipo de Punto Crítico:
+
+1. **Nodo**: Si M₁ y M₂ son valores propios reales diferentes del mismo signo
+2. **Silla**: Si M₁ y M₂ son valores propios reales con signos opuestos
+3. **Foco o Espiral**: Si M₁ y M₂ son valores propios complejos conjugados (no imaginarios puros)
+4. **Centro**: Si M₁ y M₂ son valores propios imaginarios puros (parte real = 0)
+5. **Nodo Especial**: Si M₁ = M₂ (valores propios iguales)
+
+### Clasificación por Estabilidad:
+
+- **Asintóticamente Estable**: Si todos los valores propios tienen parte real negativa
+- **Estable**: Si todos los valores propios tienen parte real no positiva (≤ 0)
+- **Inestable**: Si existe algún valor propio con parte real positiva
 
 ## Casos Especiales
 
 Si el determinante es cero (o muy cercano a cero), el programa mostrará:
-"El punto crítico (0,0) no es único"
+**"El punto crítico (0,0) no es único"**
 
 Esto indica que hay infinitos puntos críticos o que el sistema es degenerado.
+
+## Ejemplos de Uso
+
+### Ejemplo 1: Nodo Estable
+- Coeficientes: a₁=-2, b₁=0, a₂=0, b₂=-3
+- Resultado: Nodo, Asintóticamente Estable
+- Valores propios: -2.000, -3.000
+
+### Ejemplo 2: Silla Inestable
+- Coeficientes: a₁=2, b₁=0, a₂=0, b₂=-1
+- Resultado: Silla, Inestable
+- Valores propios: 2.000, -1.000
+
+### Ejemplo 3: Foco Estable
+- Coeficientes: a₁=-1, b₁=2, a₂=-2, b₂=-1
+- Resultado: Foco o Espiral, Asintóticamente Estable
+- Valores propios: -1.000±2.000i
+
+### Ejemplo 4: Centro
+- Coeficientes: a₁=0, b₁=1, a₂=-1, b₂=0
+- Resultado: Centro, Estable
+- Valores propios: ±1.000i
+
+## Cambios Recientes
+
+- ✅ **Corrección de la lógica**: Implementación correcta de los teoremas de clasificación
+- ✅ **Mejora en la precisión**: Uso de valores propios en lugar de determinante/traza
+- ✅ **Casos especiales**: Manejo correcto del Nodo Especial y valores propios complejos
+- ✅ **Verificación**: Pruebas exhaustivas de todos los casos posibles
