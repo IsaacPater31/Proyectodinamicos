@@ -69,34 +69,82 @@ def analizar_estabilidad(a1, b1, a2, b2):
     
     # Calcular valores propios
     valores_propios = np.linalg.eigvals(A)
+    m1, m2 = valores_propios[0], valores_propios[1]
     
     # Verificar si el punto crítico es único
     if abs(det) < 1e-10:  # Usar tolerancia numérica
         return "El punto crítico (0,0) no es único"
     
-    # Determinar tipo de punto crítico y estabilidad
-    if det > 0:
-        if traza < 0:
-            return "Nodo estable (atractor)\nValores propios: {:.2f}, {:.2f}".format(
-                valores_propios[0], valores_propios[1])
-        elif traza > 0:
-            return "Nodo inestable (repulsor)\nValores propios: {:.2f}, {:.2f}".format(
-                valores_propios[0], valores_propios[1])
+    # Determinar tipo de punto crítico según los teoremas dados
+    tipo_punto = determinar_tipo_punto_critico(m1, m2)
+    estabilidad = determinar_estabilidad(m1, m2)
+    
+    resultado = f"{tipo_punto}\n{estabilidad}\nValores propios: {m1:.3f}, {m2:.3f}"
+    return resultado
+
+def determinar_tipo_punto_critico(m1, m2):
+    """
+    Determina el tipo de punto crítico según los teoremas dados
+    
+    Args:
+        m1, m2: Valores propios del sistema
+        
+    Returns:
+        str: Tipo de punto crítico
+    """
+    # Verificar si son valores propios reales
+    if np.isreal(m1) and np.isreal(m2):
+        # Caso 1: M1 y M2 son reales diferentes
+        if abs(m1 - m2) > 1e-10:
+            if np.sign(m1) == np.sign(m2):
+                return "Nodo"
+            else:
+                return "Silla"
+        # Caso 5: M1 = M2 (Nodo Especial)
         else:
-            return "Centro\nValores propios: {:.2f}, {:.2f}".format(
-                valores_propios[0], valores_propios[1])
+            return "Nodo Especial"
     
-    elif det < 0:
-        return "Punto silla (inestable)\nValores propios: {:.2f}, {:.2f}".format(
-            valores_propios[0], valores_propios[1])
+    # Verificar si son valores propios complejos
+    elif not np.isreal(m1) and not np.isreal(m2):
+        # Verificar si son conjugados complejos
+        if abs(m1 - np.conj(m2)) < 1e-10:
+            # Verificar si son imaginarios puros (parte real = 0)
+            if abs(np.real(m1)) < 1e-10 and abs(np.real(m2)) < 1e-10:
+                return "Centro"
+            else:
+                return "Foco o Espiral"
+        else:
+            return "Caso especial complejo"
     
+    # Caso mixto (no debería ocurrir en sistemas lineales 2x2)
     else:
-        if abs(traza) > 1e-10:
-            return "Nodo impropio\nValores propios: {:.2f}, {:.2f}".format(
-                valores_propios[0], valores_propios[1])
-        else:
-            return "Caso degenerado\nValores propios: {:.2f}, {:.2f}".format(
-                valores_propios[0], valores_propios[1])
+        return "Caso degenerado"
+
+def determinar_estabilidad(m1, m2):
+    """
+    Determina la estabilidad según los teoremas dados
+    
+    Args:
+        m1, m2: Valores propios del sistema
+        
+    Returns:
+        str: Tipo de estabilidad
+    """
+    # Obtener partes reales
+    parte_real_m1 = np.real(m1)
+    parte_real_m2 = np.real(m2)
+    
+    # Teorema de estabilidad:
+    # - Estable si todos los autovalores tienen parte real no positiva
+    # - Asintóticamente estable si todos tienen parte real negativa
+    # - Inestable si existe algún autovalor con parte real positiva
+    
+    if parte_real_m1 < 0 and parte_real_m2 < 0:
+        return "Asintóticamente Estable"
+    elif parte_real_m1 <= 0 and parte_real_m2 <= 0:
+        return "Estable"
+    else:
+        return "Inestable"
 
 def calcular():
     try:
