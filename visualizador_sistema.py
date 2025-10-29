@@ -128,8 +128,17 @@ class VisualizadorSistema:
         valores_propios = np.linalg.eigvals([[a1, b1], [a2, b2]])
         max_real = max(np.abs(np.real(valores_propios)))
         
+        # Verificar si es una silla (valores propios reales con signos opuestos)
+        es_silla = False
+        if np.isreal(valores_propios[0]) and np.isreal(valores_propios[1]):
+            if np.sign(np.real(valores_propios[0])) != np.sign(np.real(valores_propios[1])):
+                es_silla = True
+        
         # Ajustar rango según el comportamiento del sistema
-        if max_real > 2:
+        if es_silla:
+            # Para sillas, usar rango más amplio para mostrar mejor el comportamiento divergente
+            rango = 4.0
+        elif max_real > 2:
             rango = 1.5
         elif max_real > 1:
             rango = 2.0
@@ -147,8 +156,11 @@ class VisualizadorSistema:
         ax.quiver(X, Y, U, V, magnitud, cmap='plasma', alpha=0.8, scale=30, 
                  scale_units='xy', width=0.003)
         
-        # Seleccionar puntos iniciales estratégicos
-        if max_real > 1:  # Sistema rápido
+        # Seleccionar puntos iniciales estratégicos según el tipo de sistema
+        if es_silla:
+            # Para sillas, usar más puntos iniciales distribuidos en el rango amplio
+            puntos_iniciales = [-rango*0.9, -rango*0.6, -rango*0.3, rango*0.3, rango*0.6, rango*0.9]
+        elif max_real > 1:  # Sistema rápido
             puntos_iniciales = [-rango*0.8, -rango*0.4, rango*0.4, rango*0.8]
         else:  # Sistema lento
             puntos_iniciales = [-rango*0.9, -rango*0.6, -rango*0.3, rango*0.3, rango*0.6, rango*0.9]
@@ -160,7 +172,9 @@ class VisualizadorSistema:
             for j, y0 in enumerate(puntos_iniciales):
                 if abs(x0) > 0.1 or abs(y0) > 0.1:  # Evitar el punto crítico
                     try:
-                        x_traj, y_traj = self.calcular_trayectoria(x0, y0, a1, b1, a2, b2)
+                        # Para sillas, usar tiempo de integración más largo para mostrar mejor la divergencia
+                        t_max = 4.0 if es_silla else 3.0
+                        x_traj, y_traj = self.calcular_trayectoria(x0, y0, a1, b1, a2, b2, t_max=t_max)
                         
                         # Filtrar trayectorias que se salen del rango
                         mask = (np.abs(x_traj) < rango*1.2) & (np.abs(y_traj) < rango*1.2)
@@ -169,8 +183,10 @@ class VisualizadorSistema:
                         
                         if len(x_traj) > 10:  # Solo mostrar trayectorias significativas
                             color_idx = (i + j) % len(colores)
+                            # Para sillas, usar líneas más gruesas para mejor visibilidad
+                            linewidth = 1.5 if es_silla else 1.2
                             ax.plot(x_traj, y_traj, color=colores[color_idx], 
-                                   linewidth=1.2, alpha=0.8)
+                                   linewidth=linewidth, alpha=0.8)
                             
                             # Marcar punto inicial
                             ax.plot(x0, y0, 'o', color=colores[color_idx], 
