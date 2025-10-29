@@ -10,10 +10,11 @@ y' = a₂x + b₂y
 ## Características
 
 - **Análisis matemático completo**: Determina el tipo de punto crítico y su estabilidad según los teoremas de sistemas dinámicos
-- **Visualización gráfica**: Muestra las trayectorias alrededor del punto crítico
-- **Interfaz mejorada**: Diseño moderno y fácil de usar
-- **Modularidad**: Código organizado en módulos separados
+- **Visualización gráfica responsiva**: Muestra las trayectorias alrededor del punto crítico con tamaño adaptativo
+- **Interfaz moderna**: Diseño profesional con campos vacíos y resultados estructurados
+- **Modularidad**: Código organizado en módulos separados con responsabilidades claras
 - **Implementación correcta**: Sigue estrictamente los teoremas matemáticos para clasificación
+- **Integración numérica robusta**: Usa scipy para trayectorias precisas con fallback automático
 
 ## Archivos del Proyecto
 
@@ -26,13 +27,14 @@ y' = a₂x + b₂y
 - Python 3.7+
 - numpy
 - matplotlib
+- scipy (opcional, mejora precisión de trayectorias)
 - tkinter (incluido con Python)
 
 ## Instalación
 
 1. Instalar las dependencias:
 ```bash
-pip install numpy matplotlib
+pip install numpy matplotlib scipy
 ```
 
 ## Uso
@@ -48,9 +50,9 @@ python main.py
 
 4. El programa mostrará:
    - El tipo de punto crítico
-   - Su estabilidad
+   - Su estabilidad  
    - Los valores propios
-   - Una gráfica con las trayectorias
+   - Una gráfica responsiva con trayectorias adaptativas
 
 ## Teoremas Implementados
 
