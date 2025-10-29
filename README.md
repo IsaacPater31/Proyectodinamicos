@@ -10,7 +10,7 @@ y' = a₂x + b₂y
 ## Características
 
 - **Análisis matemático completo**: Determina el tipo de punto crítico y su estabilidad según los teoremas de sistemas dinámicos
-- **Visualización gráfica responsiva**: Muestra las trayectorias alrededor del punto crítico con tamaño adaptativo
+- **Visualización gráfica responsiva**: Muestra las trayectorias alrededor del punto crítico con tamaño adaptativo y optimizaciones específicas por tipo
 - **Interfaz moderna**: Diseño profesional con campos vacíos y resultados estructurados
 - **Modularidad**: Código organizado en módulos separados con responsabilidades claras
 - **Implementación correcta**: Sigue estrictamente los teoremas matemáticos para clasificación
@@ -86,10 +86,11 @@ Esto indica que hay infinitos puntos críticos o que el sistema es degenerado.
 - Resultado: Nodo, Asintóticamente Estable
 - Valores propios: -2.000, -3.000
 
-### Ejemplo 2: Silla Inestable
+### Ejemplo 2: Silla Inestable (Optimizada)
 - Coeficientes: a₁=2, b₁=0, a₂=0, b₂=-1
 - Resultado: Silla, Inestable
 - Valores propios: 2.000, -1.000
+- **Visualización optimizada**: Rango amplio (-4, +4), líneas gruesas, tiempo extendido
 
 ### Ejemplo 3: Foco Estable
 - Coeficientes: a₁=-1, b₁=2, a₂=-2, b₂=-1
