@@ -91,18 +91,37 @@ class VisualizadorSistema:
         
         return np.array(x_traj), np.array(y_traj)
     
-    def crear_grafica_completa(self, a1, b1, a2, b2, titulo="Trayectorias del Sistema"):
+    def crear_grafica_completa(self, a1, b1, a2, b2, titulo="Trayectorias del Sistema", parent_frame=None):
         """
         Crea una gráfica completa con campo vectorial y trayectorias
         
         Args:
             a1, b1, a2, b2: Coeficientes del sistema
             titulo: Título de la gráfica
+            parent_frame: Frame padre para calcular tamaño dinámico
             
         Returns:
             matplotlib.figure.Figure: Figura con la gráfica
         """
-        fig = plt.Figure(figsize=self.figura_tamano)
+        # Calcular tamaño dinámico si se proporciona el frame padre
+        if parent_frame:
+            try:
+                # Obtener dimensiones del frame padre
+                parent_frame.update_idletasks()
+                width = parent_frame.winfo_width()
+                height = parent_frame.winfo_height()
+                
+                # Convertir píxeles a pulgadas (DPI típico: 100)
+                dpi = 100
+                fig_width = max(width / dpi, 6)  # Mínimo 6 pulgadas
+                fig_height = max(height / dpi, 4)  # Mínimo 4 pulgadas
+                
+                fig = plt.Figure(figsize=(fig_width, fig_height), dpi=dpi)
+            except:
+                fig = plt.Figure(figsize=self.figura_tamano)
+        else:
+            fig = plt.Figure(figsize=self.figura_tamano)
+            
         ax = fig.add_subplot(111)
         
         # Determinar el rango dinámico basado en los valores propios
@@ -183,7 +202,7 @@ class VisualizadorSistema:
     
     def crear_canvas_tkinter(self, parent_frame, figura):
         """
-        Crea un canvas de Tkinter para mostrar la figura
+        Crea un canvas de Tkinter para mostrar la figura estática
         
         Args:
             parent_frame: Frame padre donde se colocará el canvas
@@ -196,9 +215,12 @@ class VisualizadorSistema:
         for widget in parent_frame.winfo_children():
             widget.destroy()
         
-        # Crear nuevo canvas
+        # Crear nuevo canvas estático
         canvas = FigureCanvasTkAgg(figura, parent_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        # Hacer que el canvas sea completamente responsivo
+        canvas.get_tk_widget().configure(width=1, height=1)  # Forzar expansión
         
         return canvas

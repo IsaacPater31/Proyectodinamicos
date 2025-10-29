@@ -152,14 +152,22 @@ class InterfazAnalisisEstabilidad:
         self.texto_resultados.configure(yscrollcommand=scrollbar.set)
         
     def crear_panel_visualizacion(self):
-        """Crea el panel de visualización"""
+        """Crea el panel de visualización completamente responsivo"""
         self.frame_visualizacion = ttk.LabelFrame(self.frame_principal, text="Visualización Gráfica",
-                                                padding="10")
+                                                padding="5")
         self.frame_visualizacion.grid(row=0, column=1, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Frame para la gráfica
-        self.frame_grafica = ttk.Frame(self.frame_visualizacion)
-        self.frame_grafica.pack(fill=tk.BOTH, expand=True)
+        # Configurar expansión del frame de visualización
+        self.frame_visualizacion.columnconfigure(0, weight=1)
+        self.frame_visualizacion.rowconfigure(0, weight=1)
+        
+        # Frame para la gráfica - completamente responsivo
+        self.frame_grafica = tk.Frame(self.frame_visualizacion, bg='white')
+        self.frame_grafica.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Configurar expansión del frame de gráfica
+        self.frame_grafica.columnconfigure(0, weight=1)
+        self.frame_grafica.rowconfigure(0, weight=1)
         
     def obtener_coeficientes(self):
         """Obtiene los coeficientes de las entradas"""
@@ -207,7 +215,7 @@ class InterfazAnalisisEstabilidad:
             self.mostrar_resultado(resultado)
             
             # Crear y mostrar gráfica
-            figura = self.visualizador.crear_grafica_completa(a1, b1, a2, b2)
+            figura = self.visualizador.crear_grafica_completa(a1, b1, a2, b2, parent_frame=self.frame_grafica)
             self.visualizador.crear_canvas_tkinter(self.frame_grafica, figura)
             
         except ValueError as e:
@@ -223,9 +231,12 @@ class InterfazAnalisisEstabilidad:
         self.entry_b2.delete(0, tk.END)
         self.texto_resultados.delete(1.0, tk.END)
         
-        # Limpiar gráfica
+        # Limpiar gráfica completamente
         for widget in self.frame_grafica.winfo_children():
             widget.destroy()
+        
+        # Forzar actualización del layout
+        self.frame_grafica.update_idletasks()
     
     def ejecutar(self):
         """Ejecuta la aplicación"""
