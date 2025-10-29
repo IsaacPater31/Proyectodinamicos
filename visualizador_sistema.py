@@ -195,7 +195,7 @@ class VisualizadorSistema:
                         continue
         
         # Marcar el punto crítico con mejor visibilidad
-        ax.plot([0], [0], 'ko', markersize=15, label='Punto crítico (0,0)', 
+        ax.plot([0], [0], 'ko', markersize=15, 
                 markeredgecolor='white', markeredgewidth=3, zorder=10)
         
         # Configurar gráfica con mejor estilo
@@ -204,7 +204,11 @@ class VisualizadorSistema:
         ax.set_title(titulo, fontsize=14, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.4, linestyle='--')
         ax.set_aspect('equal')
-        ax.legend(loc='best', fontsize=10)
+        
+        # Agregar leyenda del punto crítico en la esquina superior derecha
+        ax.text(0.98, 0.98, 'Punto crítico (0,0)', transform=ax.transAxes, 
+                fontsize=10, fontweight='bold', ha='right', va='top',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8, edgecolor='black'))
         
         # Establecer límites de los ejes
         ax.set_xlim(-rango, rango)
